@@ -1,0 +1,12 @@
+[Unit]
+Description=Feren PoC Welcome Screen Shell
+ConditionFileIsExecutable=/usr/bin/feren-plasma-initial-config
+Before=getty@tty1.service getty@tty2.service getty@tty3.service getty@tty4.service getty@tty5.service getty@tty6.service display-manager.service feren-majorupdate-autoreboot.service lightdm.service sddm.service feren-poc-welcomeshell-second.service default.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c '/usr/bin/feren-plasma-initial-config'
+TimeoutSec=infinity
+
+[Install]
+WantedBy=multi-user.target

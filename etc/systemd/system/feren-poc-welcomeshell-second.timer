@@ -1,0 +1,10 @@
+[Unit]
+Description=Feren PoC Welcome Screen Shell Secondcoming Timer
+
+[Timer]
+OnBootSec=10s
+OnUnitActiveSec=10s
+Unit=feren-poc-welcomeshell-second.service
+
+[Install]
+WantedBy=default.target

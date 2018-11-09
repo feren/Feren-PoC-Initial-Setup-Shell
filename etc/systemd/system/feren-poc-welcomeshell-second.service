@@ -1,0 +1,15 @@
+[Unit]
+Description=Feren PoC Welcome Screen Shell Secondcoming
+ConditionFileIsExecutable=/usr/bin/feren-plasma-initial-config
+After=feren-poc-welcomeshell.service graphical.target network.target
+Wants=graphical.target
+ConditionFileExists=/tmp/initial-setup-complete
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/feren-plasma-initial-config-2nd
+TimeoutSec=infinity
+
+[Install]
+WantedBy=default.target

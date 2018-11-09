@@ -1,0 +1,10 @@
+#!/bin/bash
+
+chmod +x /usr/bin/feren-plasma-initial-config
+chmod +x /usr/bin/feren-plasma-initial-config-2nd
+chmod +x /usr/local/sbin/kcmshell5-welcome
+
+systemctl enable feren-poc-welcomeshell.service
+systemctl enable feren-poc-welcomeshell-second.service
+systemctl enable feren-poc-welcomeshell-second.timer
+systemctl daemon-reload

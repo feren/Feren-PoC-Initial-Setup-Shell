@@ -1,0 +1,35 @@
+#!/bin/bash
+
+usernm=$(cat /etc/feren-poc-welcome-user)
+#Check for when the user is finished.
+if [ ! -f "/tmp/initial-setup-complete" ]; then
+    exit 1
+fi
+killall --user $usernm
+#Remove user entirely
+/usr/sbin/deluser $usernm
+/bin/rm -rf /home/$usernm
+#Remove Initial Config and Restrictions since we don't need them anymore
+/bin/rm -f /tmp/initial-setup-complete
+/bin/rm -f /etc/xdg/kdeglobals
+/bin/mv -f /etc/feren-kdeglobals-backup /etc/xdg/kdeglobals
+/bin/mv -f /usr/share/kubuntu-default-settings/kf5-settings/kdeglobals-backup /usr/share/kubuntu-default-settings/kf5-settings/kdeglobals
+/bin/rm -f /usr/local/sbin/kcmshell5
+if [ -f /usr/local/sbin/kcmshell5-backup ]; then
+    /bin/mv /usr/local/sbin/kcmshell5-backup /usr/local/sbin/kcmshell5
+fi
+/bin/rm -f /usr/bin/spectacle
+if [ -f /usr/bin/spectacle-backup ]; then
+    /bin/mv /usr/bin/spectacle-backup /usr/bin/spectacle
+fi
+/bin/rm -f /usr/share/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
+/bin/mv -f /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js-backup /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
+/bin/rm -f /etc/feren-poc-welcome-user
+/bin/systemctl disable feren-poc-welcomeshell.service
+/bin/systemctl disable feren-poc-welcomeshell-second.service
+/bin/rm -f /etc/systemd/system/feren-poc-welcomeshell.service
+/bin/rm -f /etc/systemd/system/feren-poc-welcomeshell-second.service
+/bin/rm -f /usr/share/polkit-1/actions/org.freedesktop.NetworkManager.policy
+/bin/mv -f /etc/feren-10-network-manager /usr/share/polkit-1/actions/org.freedesktop.NetworkManager.policy
+/usr/bin/nohup apt-get purge feren-poc-welcome -y
+/bin/rm -f /etc/sddm.conf.d/feren-initial-setup.conf

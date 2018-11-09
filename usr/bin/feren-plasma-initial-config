@@ -1,0 +1,83 @@
+#!/bin/bash
+
+if [ "$1" = "--startup" ]; then
+    pkexec feren-plasma-initial-config-tasks --start-timer
+    nemo
+    exit 0
+fi
+
+#First, we'll determine the user name for the user account to be created with during the installation.
+if [ ! -f /etc/feren-poc-welcome-user ]; then
+    #Let's try to generate a user for use in the Initial Config
+    user="feren$RANDOM"
+    while [ -d /home/$user ]; do
+        user="$user$RANDOM"
+    done
+    #At this point we've made sure the user WILL NOT conflict with other users on the system
+    /bin/echo "$user" > /etc/feren-poc-welcome-user
+    /usr/sbin/adduser $user --force-badname --disabled-password --gecos "Initial Setup"
+    /usr/sbin/adduser $user sudo
+    /usr/sbin/adduser $user adm
+    /usr/sbin/adduser $user cdrom
+    /usr/sbin/adduser $user dip
+    /usr/sbin/adduser $user lpadmin
+    /usr/sbin/adduser $user plugdev
+    /usr/sbin/adduser $user sambashare
+
+    #Make the restrictions here
+    /bin/cp -fr /etc/xdg/kdeglobals /etc/feren-kdeglobals-backup
+    /bin/echo "[KDE Action Restrictions]
+    action/kwin_rmb=false
+    plasma/allow_configure_when_locked=false
+    plasma/plasmashell/unlockedDesktop=false
+    run_command=false
+    action/lock_screen=false
+    editable_desktop_icons=false
+    action/switch_user=false
+    action/start_new_session=false
+    plasma/containment_actions=false
+    action/configdesktop=false
+    plasma-desktop/add_activities=false" > /etc/xdg/kdeglobals
+    /bin/mv /usr/share/kubuntu-default-settings/kf5-settings/kdeglobals /usr/share/kubuntu-default-settings/kf5-settings/kdeglobals-backup
+    if [ -f /usr/local/sbin/kcmshell5 ]; then
+        /bin/mv /usr/local/sbin/kcmshell5 /usr/local/sbin/kcmshell5-backup
+    fi
+    /bin/cp -f /usr/local/sbin/kcmshell5-welcome /usr/local/sbin/kcmshell5
+    if [ -f /usr/bin/spectacle ]; then
+        /bin/mv /usr/bin/spectacle /usr/bin/spectacle-backup
+    fi
+    /bin/cp -f /usr/bin/spectacle-welcome /usr/bin/spectacle
+    /bin/chmod +x /usr/local/sbin/kcmshell5
+    /bin/chmod +x /usr/bin/spectacle
+    /bin/mv -f /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js-backup
+    /bin/cp -f /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js-welcome /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
+    /bin/rm -rf /home/$user/Desktop /home/$user/Pictures /home/$user/.config/autostart/*.desktop
+    /bin/echo "[Daemon]
+Autolock=false" > /home/$user/.config/kscreenlockerrc
+    /bin/cp -f /usr/share/polkit-1/actions/org.freedesktop.NetworkManager.policy /etc/feren-10-network-manager
+    /bin/echo "[Desktop Entry]
+Type=Application
+Exec=/usr/bin/feren-plasma-initial-config --startup
+Name=Initial Setup
+Terminal=false" > /home/$user/.config/autostart/InitialConfig.desktop
+    /bin/chown -h $user:$user /home/$user/.config/autostart/InitialConfig.desktop
+    /bin/chmod +x /home/$user/.config/autostart/InitialConfig.desktop
+    /bin/cp -f /usr/share/feren-os/kglobalshortcutsrc-initial-setup /home/$user/.config/kglobalshortcutsrc
+    /bin/chown -h $user:$user /home/$user/.config/kglobalshortcutsrc
+else
+    user=$(cat /etc/feren-poc-welcome-user)
+fi
+
+#Set up the desktop experience, and get everything running as the user, handing over this part to the Desktop Process...
+if [ ! -d /etc/sddm.conf.d ]; then
+    /bin/mkdir /etc/sddm.conf.d
+fi
+/bin/echo "[Autologin]
+User=$user
+Session=plasma.desktop
+
+[Users]
+HideUsers=$user" > /etc/sddm.conf.d/feren-initial-setup.conf
+
+#We're done here, now to give the initial setup operations to SDDM and Secondcoming.
+exit 0

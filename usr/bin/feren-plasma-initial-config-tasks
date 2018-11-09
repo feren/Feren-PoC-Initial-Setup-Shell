@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [ "$1" = "--start-timer" ]; then
+    systemctl start feren-poc-welcomeshell-second.timer
+fi

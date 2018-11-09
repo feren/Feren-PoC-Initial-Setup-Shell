@@ -1,0 +1,3 @@
+#!/bin/bash
+
+zenity --error --title="Dialog is open" --text="You cannot perform this operation while the Welcome Screen is running." --no-wrap
