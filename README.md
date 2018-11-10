@@ -16,4 +16,4 @@ Well, besides the fact some things won't work out of the box due to being design
 <h2>Screenshot?</h2>
 Here's a screenshot of it, in its current state:
 
-[![](Screenshot_20181107_181400.png)][repo]
+![](Screenshot_20181107_181400.png)
