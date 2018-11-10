@@ -1,4 +1,5 @@
 #!/bin/bash
+#Just a file to throw in things for the Initial Setup window to do as Superuser so it can do these things without a password prompt on this user
 
 if [ "$1" = "--start-timer" ]; then
     systemctl start feren-poc-welcomeshell-second.timer
