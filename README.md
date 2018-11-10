@@ -17,6 +17,6 @@ Well, besides the fact some things won't work out of the box due to being design
 Simply create a file in /tmp/ called 'initial-setup-complete'. Assuming the SystemD Timer gets started for checking for this file when the user logs in, it should 'finish' setup and remove itself from your system shortly after that file is made.
 
 <h2>Screenshot?</h2>
-Here's a screenshot of it, in its current state:
+Here's a screenshot of it, in its current state: (PS: I used Spectacle to take this screenshot in a version from before Spectacle was made unusable during the time you're in this user intentionally)
 
 ![](Screenshot_20181107_181400.png)
