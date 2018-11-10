@@ -14,4 +14,6 @@ No. The reason it's incomplete is because it completely lacks the Initial Setup 
 Well, besides the fact some things won't work out of the box due to being designed for Feren OS 'KDE Experimental', it could be flawed in parts, security-wise (e.g.: The fact the user is given 'sudo'/Administrator), but also it has a HUGE NEED on SDDM in its current form, and also on Plasma being installed (obviously).
 
 <h2>Screenshot?</h2>
-I'll add a screenshot a little bit later, watch this space...
+Here's a screenshot of it, in its current state:
+
+[![](Screenshot_20181107_181400.png)][repo]
