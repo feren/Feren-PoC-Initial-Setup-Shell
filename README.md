@@ -9,6 +9,7 @@ Well, I thought that any distribution development teams using a Plasma DE in the
 
 <h2>Is it complete?</h2>
 No. The reason it's incomplete is because it completely lacks the Initial Setup window itself. This is, for now, literally just for building the Plasma Shell to contain a Initial Setup window that is then made by someone else. I would honestly try to make a window for it myself, but I don't know if I would ever be able to make it properly translatable from English by myself. For now it launches Nemo to be a substitute for that window.
+(For anyone considering forking this, I'd change the 'nemo' command in the startup tasks argument to 'dolphin' for the first change, as it's Nemo due to being made on Feren OS KDE Experimental, where Nemo is used instead - The Feren OS Dev)
 
 <h2>Outside of that, is there any other known issues?</h2>
 Well, besides the fact some things won't work out of the box due to being designed for Feren OS 'KDE Experimental', it could be flawed in parts, security-wise (e.g.: The fact the user is given 'sudo'/Administrator), but also it has a HUGE NEED on SDDM in its current form, and also on Plasma being installed (obviously). Oh, and there's also the issue that the -second.service SystemD Service seems to die (with no fail status) without output the first time it's ran, and also that the -second.timer dies the first time it runs during bootup with error 'resources', for me, at least...
