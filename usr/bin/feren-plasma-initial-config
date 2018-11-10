@@ -1,7 +1,9 @@
 #!/bin/bash
 
 if [ "$1" = "--startup" ]; then
+    #This is what to launch at startup on the Initial Config user
     pkexec feren-plasma-initial-config-tasks --start-timer
+    #This command here's just a file browser window so I can easily make it activate its "Complete" status from within the user, I use Nemo on my system, that's why it's Nemo
     nemo
     exit 0
 fi
@@ -16,6 +18,7 @@ if [ ! -f /etc/feren-poc-welcome-user ]; then
     #At this point we've made sure the user WILL NOT conflict with other users on the system
     /bin/echo "$user" > /etc/feren-poc-welcome-user
     /usr/sbin/adduser $user --force-badname --disabled-password --gecos "Initial Setup"
+    #I wasn't so sure on what groups to give the user here, so I was being safe and putting the default groups on this user
     /usr/sbin/adduser $user sudo
     /usr/sbin/adduser $user adm
     /usr/sbin/adduser $user cdrom
@@ -25,7 +28,9 @@ if [ ! -f /etc/feren-poc-welcome-user ]; then
     /usr/sbin/adduser $user sambashare
 
     #Make the restrictions here
+    #Backing up kdeglobals so we don't lose it, if it is there already on the OS
     /bin/cp -fr /etc/xdg/kdeglobals /etc/feren-kdeglobals-backup
+    #This is the restriction set I ended up choosing for my config here, you might want to change, or you might agree with my restrictions, either way
     /bin/echo "[KDE Action Restrictions]
     action/kwin_rmb=false
     plasma/allow_configure_when_locked=false
@@ -38,23 +43,30 @@ if [ ! -f /etc/feren-poc-welcome-user ]; then
     plasma/containment_actions=false
     action/configdesktop=false
     plasma-desktop/add_activities=false" > /etc/xdg/kdeglobals
+    #Remove Kubuntu's potential kdeglobals override temporarily so the restrictions still fall into place successfully
     /bin/mv /usr/share/kubuntu-default-settings/kf5-settings/kdeglobals /usr/share/kubuntu-default-settings/kf5-settings/kdeglobals-backup
+    #Adding a program to prevent 'System Settings Module' windows from launching, due to the potential for being able to escape the restrictions through these windows
     if [ -f /usr/local/sbin/kcmshell5 ]; then
+        #In case there's already one here, we'll back it up to make sure we don't lose it.
         /bin/mv /usr/local/sbin/kcmshell5 /usr/local/sbin/kcmshell5-backup
     fi
     /bin/cp -f /usr/local/sbin/kcmshell5-welcome /usr/local/sbin/kcmshell5
+    #You might find a better way to stop PrtScrn from functioning here than I managed to, but since Spectacle allows for easy access to File Manager and therefore access to Konsole, and more...
     if [ -f /usr/bin/spectacle ]; then
         /bin/mv /usr/bin/spectacle /usr/bin/spectacle-backup
     fi
     /bin/cp -f /usr/bin/spectacle-welcome /usr/bin/spectacle
     /bin/chmod +x /usr/local/sbin/kcmshell5
     /bin/chmod +x /usr/bin/spectacle
+    #Backing up and replacing the Vanilla 'Default' Plasma Panel Layout to make it build the panel layout instead that better suits the Initial Setup Shell - you might need to change this if Kubuntu's Kubuntu Panel is the default panel to be built...
     /bin/mv -f /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js-backup
     /bin/cp -f /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js-welcome /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
+    #This is mainly for Feren OS 'KDE Experimental', since it has startup programs, Desktop Icons, and a Pictures Folder on new users, but I left it in just in case
     /bin/rm -rf /home/$user/Desktop /home/$user/Pictures /home/$user/.config/autostart/*.desktop
+    #We disabled Locking the screen here, but it doesn't count on Autolocking, so we need to disable that too to prevent us from getting locked out of Initial Setup's user
     /bin/echo "[Daemon]
 Autolock=false" > /home/$user/.config/kscreenlockerrc
-    /bin/cp -f /usr/share/polkit-1/actions/org.freedesktop.NetworkManager.policy /etc/feren-10-network-manager
+    #Make an initial setup shortcut for autostart on the user
     /bin/echo "[Desktop Entry]
 Type=Application
 Exec=/usr/bin/feren-plasma-initial-config --startup
@@ -62,9 +74,11 @@ Name=Initial Setup
 Terminal=false" > /home/$user/.config/autostart/InitialConfig.desktop
     /bin/chown -h $user:$user /home/$user/.config/autostart/InitialConfig.desktop
     /bin/chmod +x /home/$user/.config/autostart/InitialConfig.desktop
+    #You might need to tweak this file too for Kubuntu, it's slightly sloppy in its current form right now...
     /bin/cp -f /usr/share/feren-os/kglobalshortcutsrc-initial-setup /home/$user/.config/kglobalshortcutsrc
     /bin/chown -h $user:$user /home/$user/.config/kglobalshortcutsrc
 else
+    #If this isn't the first bootup into the Proof-of-concept Initial Setup Shell, we ought to know the username again, just in case
     user=$(cat /etc/feren-poc-welcome-user)
 fi
 
@@ -72,6 +86,7 @@ fi
 if [ ! -d /etc/sddm.conf.d ]; then
     /bin/mkdir /etc/sddm.conf.d
 fi
+#Make the new user be on autologin so we automatically log in to that user first
 /bin/echo "[Autologin]
 User=$user
 Session=plasma.desktop
