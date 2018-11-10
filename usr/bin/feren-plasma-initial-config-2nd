@@ -1,10 +1,12 @@
 #!/bin/bash
 
+#Get to know which username we need to remove from the system, therefore removing the Initial Config User now we don't need it
 usernm=$(cat /etc/feren-poc-welcome-user)
 #Check for when the user is finished.
 if [ ! -f "/tmp/initial-setup-complete" ]; then
     exit 1
 fi
+#Kill them just in case, we don't need the user removal failing, do we?
 killall --user $usernm
 #Remove user entirely
 /usr/sbin/deluser $usernm
@@ -12,24 +14,29 @@ killall --user $usernm
 #Remove Initial Config and Restrictions since we don't need them anymore
 /bin/rm -f /tmp/initial-setup-complete
 /bin/rm -f /etc/xdg/kdeglobals
+#Restore the old kdeglobals
 /bin/mv -f /etc/feren-kdeglobals-backup /etc/xdg/kdeglobals
+#Restore Kubuntu's kdeglobals
 /bin/mv -f /usr/share/kubuntu-default-settings/kf5-settings/kdeglobals-backup /usr/share/kubuntu-default-settings/kf5-settings/kdeglobals
+#Restore KCMSHELL5 functionality
 /bin/rm -f /usr/local/sbin/kcmshell5
 if [ -f /usr/local/sbin/kcmshell5-backup ]; then
     /bin/mv /usr/local/sbin/kcmshell5-backup /usr/local/sbin/kcmshell5
 fi
+#Replace Spectacle with original file again so we can use it
 /bin/rm -f /usr/bin/spectacle
 if [ -f /usr/bin/spectacle-backup ]; then
     /bin/mv /usr/bin/spectacle-backup /usr/bin/spectacle
 fi
+#Restore the Vanilla Default Plasma Panel Layout
 /bin/rm -f /usr/share/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
 /bin/mv -f /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js-backup /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
+#Remove the rest of the changes and remove the PoC Initial Setup Screen Shell
 /bin/rm -f /etc/feren-poc-welcome-user
 /bin/systemctl disable feren-poc-welcomeshell.service
 /bin/systemctl disable feren-poc-welcomeshell-second.service
 /bin/rm -f /etc/systemd/system/feren-poc-welcomeshell.service
 /bin/rm -f /etc/systemd/system/feren-poc-welcomeshell-second.service
-/bin/rm -f /usr/share/polkit-1/actions/org.freedesktop.NetworkManager.policy
-/bin/mv -f /etc/feren-10-network-manager /usr/share/polkit-1/actions/org.freedesktop.NetworkManager.policy
 /usr/bin/nohup apt-get purge feren-poc-welcome -y
+#Remove the autologin to PoC Initial Setup's user account
 /bin/rm -f /etc/sddm.conf.d/feren-initial-setup.conf
