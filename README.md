@@ -1,3 +1,5 @@
+## All the work put into this has been moved into the https://github.com/feren-OS/oem-setup-shell project. Just replace any mentioning of Calamares in the code with whatever command is used for running Initial Setup in there and you should be good to go...
+
 # Feren-PoC-Initial-Setup-Shell
 A proof-of-concept Initial Setup Screen Shell using Plasma (SDDM only)
 
